@@ -17,19 +17,17 @@ public class SlackConfig {
 	@Value("${SLACK_SIGNING_SECRET}")
 	private String signingSecret;
 
-	@Autowired
-	private ActionBotManager botManager;
+//	@Autowired
+//	private ActionBotManager botManager;
 
 	@Bean
 	AppConfig loadSingleWorkspaceAppConfig() {
-		return AppConfig.builder()
-				.singleTeamBotToken(botToken)
-				.signingSecret(signingSecret)
-				.build();
+		return AppConfig.builder().singleTeamBotToken(botToken).signingSecret(signingSecret).build();
 	}
 
 	@Bean
-	App initSlackApp(AppConfig config) {
-		return botManager.slashCommand(new App(config));
+	App app(AppConfig config) {
+//		return botManager.appMention(new App(config)); //this works
+		return new App(config);
 	}
 }
