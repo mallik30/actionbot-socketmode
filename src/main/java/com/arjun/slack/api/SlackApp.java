@@ -6,10 +6,10 @@ import com.slack.api.bolt.App;
 import com.slack.api.bolt.servlet.SlackAppServlet;
 
 @WebServlet("/slack/events")
-public class SlackAppServlet extends SlackAppServlet {
+public class SlackApp extends SlackAppServlet {
 	private static final long serialVersionUID = 1L;
 
-	public SlackAppServlet(App app) {
+	public SlackApp(App app) {
 		super(app);
 	}
 }
