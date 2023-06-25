@@ -14,58 +14,23 @@ import com.slack.api.model.event.ReactionAddedEvent;
 @Service
 public class ActionBotManager {
 
-	@Value("${SLACK_BOT_TOKEN}")
-	private String botToken;
-
-	@Value("${SLACK_USER_TOKEN}")
-	private String userToken;
-
-//	@Autowired // not listening
+	@Autowired
 	private App app;
 
-	public ActionBotManager(ApplicationContext applicationContext) {
-//		displayAllBeans(applicationContext);
-		app = applicationContext.getBean("app", App.class);
-//		app = ApplicationContextUtils.getApplicationContext().getBean("app", App.class);
+	@PostConstruct
+	public void init() {
+		reactionAdded();
+		appMention();
 	}
 
-	public static void displayAllBeans(ApplicationContext applicationContext) {
-		String[] allBeanNames = applicationContext.getBeanDefinitionNames();
-		for (String beanName : allBeanNames) {
-			System.out.println("bean: " + beanName);
-		}
-	}
-
-	public App reactionAdded(/* App app */) {
-		return app.event(ReactionAddedEvent.class, (payload, ctx) -> {
-			ReactionAddedEvent event = payload.getEvent();
-			if (event.getReaction().equals("white_check_mark")) {
-				ChatPostMessageResponse message = ctx.client().chatPostMessage(r -> r
-						.channel(event.getItem().getChannel()).threadTs(event.getItem().getTs())
-						.text("<@" + event.getUser() + "> Thank you! We greatly appreciate your efforts :two_hearts:"));
-				if (!message.isOk()) {
-					ctx.logger.error("chat.postMessage failed: {}", message.getError());
-				}
-			}
+	public void reactionAdded() {
+		app.event(ReactionAddedEvent.class, (payload, ctx) -> {
 			return ctx.ack();
 		});
 	}
 
-	public App appMention(/* App app */) {
-		return app.event(AppMentionEvent.class, (payload, ctx) -> {
-			AppMentionEvent event = payload.getEvent();
-			String typeOfCommand = event.getText().substring(event.getText().indexOf('>') + 1);
-			if (StringUtils.isNotBlank(typeOfCommand) && typeOfCommand.trim().equals("create")) {
-				ChatPostMessageResponse message = ctx.client()
-						.chatPostMessage(r -> r.channel(event.getChannel()).threadTs(event.getTs())// event.getThreadTs()
-								.text("please provide description")); // "<@" + event.getUser() +
-
-				if (!message.isOk()) {
-					ctx.logger.error("chat.postMessage failed: {}", message.getError());
-				}
-			} else {
-				ctx.logger.info("only supports create!");
-			}
+	public void appMention() {
+		app.event(AppMentionEvent.class, (payload, ctx) -> {
 			return ctx.ack();
 		});
 	}
